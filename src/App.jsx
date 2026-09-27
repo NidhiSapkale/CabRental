@@ -29,6 +29,52 @@ export default function App() {
   const [authReady, setAuthReady] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);
 
+  const syncWalletState = async () => {
+    if (typeof window === 'undefined') {
+      console.log('window.ethereum check: unavailable because window is undefined');
+      setWalletConnected(false);
+      return;
+    }
+
+    const hasEthereum = !!window.ethereum;
+    console.log('window.ethereum exists on app load:', hasEthereum);
+
+    if (!hasEthereum) {
+      setWalletConnected(false);
+      return;
+    }
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      console.log('eth_accounts on page load result:', accounts);
+      const connected = Array.isArray(accounts) && accounts.length > 0;
+      setWalletConnected(connected);
+      console.log('wallet-connected state changed (startup):', connected);
+    } catch (error) {
+      console.error('eth_accounts check failed on page load:', error);
+      setWalletConnected(false);
+      console.log('wallet-connected state changed (startup error):', false);
+    }
+  };
+
+  const connectWallet = async () => {
+    if (typeof window === 'undefined' || !window.ethereum) {
+      console.log('Connect wallet clicked but window.ethereum is missing.');
+      return;
+    }
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const connected = Array.isArray(accounts) && accounts.length > 0;
+      setWalletConnected(connected);
+      console.log('wallet-connected state changed (manual connect):', connected, 'accounts:', accounts);
+    } catch (error) {
+      console.error('Wallet connection request failed:', error);
+      setWalletConnected(false);
+      console.log('wallet-connected state changed (manual connect error):', false);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -41,24 +87,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const syncWalletState = async () => {
-      if (typeof window === 'undefined' || !window.ethereum) {
-        setWalletConnected(false);
-        return;
-      }
-
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        setWalletConnected(Array.isArray(accounts) && accounts.length > 0);
-      } catch (error) {
-        setWalletConnected(false);
-      }
-    };
-
     syncWalletState();
 
     if (window.ethereum && window.ethereum.on) {
-      const handleAccountsChanged = (accounts) => setWalletConnected(Array.isArray(accounts) && accounts.length > 0);
+      const handleAccountsChanged = (accounts) => {
+        const connected = Array.isArray(accounts) && accounts.length > 0;
+        setWalletConnected(connected);
+        console.log('wallet-connected state changed (accountsChanged event):', connected, 'accounts:', accounts);
+      };
+
       window.ethereum.on('accountsChanged', handleAccountsChanged);
 
       return () => {
@@ -112,6 +149,16 @@ export default function App() {
           </nav>
 
           <div className="flex items-center gap-3">
+            {!walletConnected && (
+              <button
+                type="button"
+                onClick={connectWallet}
+                className="rounded-full bg-brand px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand/90 sm:text-sm"
+              >
+                Connect Wallet
+              </button>
+            )}
+
             {authReady && user ? (
               <button
                 type="button"
