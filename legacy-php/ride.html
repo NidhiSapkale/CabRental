@@ -343,6 +343,7 @@
                 </div>
                 <div class="button-section">
                     <input type="submit" value="Submit" />
+                    <button type="button" id="returnVehicleBtn" class="btn" style="margin-top: 12px;">Return Vehicle</button>
                     <span class="privacy-policy">
                         <input type="checkbox" name="field7">You agree to our Terms and Policy.
                     </span>
@@ -380,6 +381,25 @@
                 alert('Please fill out all required fields.');
             }
         });
+
+        const returnVehicleButton = document.getElementById('returnVehicleBtn');
+        if (returnVehicleButton) {
+            returnVehicleButton.addEventListener('click', async function() {
+                const vehicleId = '1';
+                try {
+                    if (typeof window === 'undefined' || !window.ethereum) {
+                        throw new Error('MetaMask is not installed. Please install it and try again.');
+                    }
+
+                    const contract = await connectWallet();
+                    const tx = await contract.returnVehicle(vehicleId);
+                    await tx.wait();
+                    alert('Vehicle returned successfully.');
+                } catch (error) {
+                    alert(error && error.message ? error.message : 'Return failed. Please try again.');
+                }
+            });
+        }
     </script>
     <script src="script.js"></script>
     <!-- Footer
@@ -410,5 +430,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc2z6lnf65V2w4HmoRbHUXaB/91MoZl6fCJVN6eK" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="js/web3-integration.js"></script>
 </body>
 </html>

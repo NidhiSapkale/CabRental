@@ -1,4 +1,1 @@
-.vscode/*
-token.json
-config.json
-credentials.json
+node_modules

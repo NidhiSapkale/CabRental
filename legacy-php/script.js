@@ -1,13 +1,77 @@
+const bookNowButton = document.getElementById('bookNow');
+
+if (bookNowButton) {
+  bookNowButton.addEventListener('click', async function () {
+    const bookingStatus = document.createElement('div');
+    bookingStatus.className = 'booking-status';
+    bookingStatus.style.marginTop = '12px';
+    bookingStatus.style.fontWeight = '600';
+    bookingStatus.style.color = '#1f2937';
+
+    const existingStatus = document.querySelector('.booking-status');
+    if (existingStatus) {
+      existingStatus.remove();
+    }
+
+    const vehicleSelect = document.getElementById('vehicle');
+    const pickupDateInput = document.getElementById('pickupDate');
+    const dropoffDateInput = document.getElementById('dropoffDate');
+    const vehicle = vehicleSelect ? vehicleSelect.value : 'Civic';
+    const pickupDate = pickupDateInput ? new Date(pickupDateInput.value) : new Date();
+    const dropoffDate = dropoffDateInput ? new Date(dropoffDateInput.value) : new Date(Date.now() + 86400000);
+    const vehicleRates = {
+      Civic: '0.08',
+      'Swift Dzire': '0.06',
+      Innova: '0.12',
+      Creta: '0.10',
+      GrandVistara: '0.09'
+    };
+    const vehicleId = vehicleSelect ? String(vehicleSelect.selectedIndex || 1) : '1';
+    const totalDays = Math.max(1, Math.ceil((dropoffDate - pickupDate) / 86400000) || 1);
+    const totalCostInEth = vehicleRates[vehicle] || '0.08';
+    const totalCost = Number(totalCostInEth) * totalDays;
+
+    bookingStatus.textContent = 'Connecting wallet and confirming booking...';
+    const originalText = bookNowButton.textContent;
+    bookNowButton.textContent = 'Processing...';
+    bookNowButton.disabled = true;
+    const bookingForm = document.querySelector('.booking-form');
+    if (bookingForm) {
+      bookingForm.appendChild(bookingStatus);
+    }
+
+    try {
+      if (typeof window === 'undefined' || !window.ethereum) {
+        throw new Error('MetaMask is not installed. Please install MetaMask and try again.');
+      }
+
+      const contract = await connectWallet();
+      const tx = await contract.rentVehicle(vehicleId, totalDays, {
+        value: ethers.utils.parseEther(totalCost.toFixed(6).toString())
+      });
+      bookingStatus.style.color = '#047857';
+      bookingStatus.textContent = 'Transaction sent. Waiting for confirmation...';
+      await tx.wait();
+      bookingStatus.style.color = '#047857';
+      bookingStatus.textContent = 'Booking confirmed on-chain! Your vehicle has been rented successfully.';
+      alert('Booking confirmed!');
+    } catch (error) {
+      bookingStatus.style.color = '#b91c1c';
+      bookingStatus.textContent = error && error.message ? error.message : 'Booking failed. Please try again.';
+      alert(error && error.message ? error.message : 'Booking failed. Please try again.');
+    } finally {
+      bookNowButton.textContent = originalText;
+      bookNowButton.disabled = false;
+    }
+  });
+}
+
 document
   .getElementById("view-all-button")
   .addEventListener("click", function () {
     const testimonialsContainer = document.getElementById(
       "testimonials-container"
     );
-    document.getElementById('bookNow').addEventListener('click', function() {
-      alert('Booking confirmed!');
-  });
-  
     const newTestimonials = [
       {
         text: "I've used many cab services before, but this one is by far the best. Highly recommended!",

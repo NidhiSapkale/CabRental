@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-cream text-ink antialiased;
+  }
+
+  body {
+    @apply min-h-screen bg-cream font-sans text-ink;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+}
+
+@layer components {
+  .page-shell {
+    @apply rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-soft sm:p-8;
+  }
+
+  .primary-btn {
+    @apply inline-flex items-center justify-center rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-brandDark hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand/10;
+  }
+
+  .secondary-btn {
+    @apply inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-200;
+  }
+
+  .input-field {
+    @apply mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 shadow-sm transition duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/10;
+  }
+
+  .form-error {
+    @apply rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700;
+  }
+}
