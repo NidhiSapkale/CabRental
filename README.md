@@ -120,6 +120,12 @@ Deployed on Vercel: _[cabrental.vercel.app]_
 
 Smart contract deployed on Sepolia: _[(https://sepolia.etherscan.io/address/0xD15ce1ed4A7355a828d00ce4546F6A7835BCA3AB)]_
 
+### Configure Vercel for your deployment
+
+The ignored local `.env` file is not uploaded to GitHub or automatically sent to Vercel. In the Vercel project, open **Settings → Environment Variables** and add the variables listed in `.env.example`, using your own Firebase Web app configuration and compatible Sepolia contract address. Enable them for each environment you use, such as Production and Preview, then redeploy. Vite reads these values when building the site, so changing them requires a new deployment.
+
+These `VITE_` values are included in the browser bundle and are not secrets. Never set private keys, Firebase Admin credentials, or service-account keys as frontend variables.
+
 ---
 
 ## 🔮 Future Scope
