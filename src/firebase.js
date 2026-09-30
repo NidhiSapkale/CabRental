@@ -3,13 +3,21 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA_nX3iImmaudYHZIDkWKYU3pwPRZVhZ7k",
-  authDomain: "cabrental-b11d9.firebaseapp.com",
-  projectId: "cabrental-b11d9",
-  storageBucket: "cabrental-b11d9.firebasestorage.app",
-  messagingSenderId: "975775551937",
-  appId: "1:975775551937:web:ceae383aae60c17437df40"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
+const missingFirebaseConfig = Object.entries(firebaseConfig)
+  .filter(([, value]) => !value)
+  .map(([field]) => field);
+
+if (missingFirebaseConfig.length > 0) {
+  throw new Error(`Missing Firebase configuration values: ${missingFirebaseConfig.join(', ')}`);
+}
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

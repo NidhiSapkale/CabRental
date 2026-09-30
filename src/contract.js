@@ -1,6 +1,10 @@
 import { BrowserProvider, Contract } from 'ethers';
 
-export const CONTRACT_ADDRESS = '0xD15ce1ed4A7355a828d00ce4546F6A7835BCA3AB';
+export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
+if (!CONTRACT_ADDRESS) {
+  throw new Error('Missing contract address. Set VITE_CONTRACT_ADDRESS in your .env file.');
+}
+
 export const CONTRACT_ABI = [
   // PASTE YOUR CONTRACT ABI ARRAY HERE
   {
