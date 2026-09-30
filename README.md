@@ -75,15 +75,42 @@ A real production version of this idea would likely use a **hybrid model**: regu
 git clone https://github.com/NidhiSapkale/CabRental.git
 cd CabRental
 npm install
+```
+
+Create a local environment file from the placeholder template:
+
+```bash
+cp .env.example .env
+```
+
+On Windows PowerShell, use `Copy-Item .env.example .env` instead. Fill in `.env` with configuration for services and deployments you control. Do not commit `.env`.
+
+### Firebase setup
+
+1. Create a Firebase project and register a Web app in that project.
+2. Copy that Web app's Firebase config into the matching `VITE_FIREBASE_*` entries in `.env`. The app uses the API key, auth domain, project ID, storage bucket, messaging sender ID, and app ID. It does not currently use Firebase Analytics or a measurement ID.
+3. In Firebase Authentication, enable the Email/Password sign-in provider.
+4. Create a Cloud Firestore database and configure Firestore security rules for your app before using real data.
+
+The `VITE_FIREBASE_*` values are browser configuration: Vite includes them in the built frontend, so they are not secrets. Use your own Firebase project and secure it with Firebase rules and appropriate API-key restrictions. Never put Admin SDK credentials or service-account keys in a `VITE_` variable.
+
+**Security note:** This app currently reads all vehicle and booking documents in the owner dashboard and performs some Firestore updates directly from the browser. Client-side filtering and login checks are not access control, and Firestore rules cannot use them to safely restrict those broad queries. Do not use the app with real personal data or an open/test-mode database until the queries and writes are redesigned around verified ownership and the deployed rules enforce it. Do not copy the Firebase quick-start rule that temporarily allows all reads and writes.
+
+### Sepolia and MetaMask setup
+
+1. Install MetaMask and add/select the Sepolia test network.
+2. Set `VITE_CONTRACT_ADDRESS` in `.env` to the address of a contract deployed on Sepolia that implements the functions in `src/contract.js`'s ABI. This repository does not include Solidity source or deployment scripts, so you need an existing compatible deployment or must deploy one separately.
+3. Fund the MetaMask account with Sepolia test ETH. Listing, renting, returning, and rating vehicles require wallet transactions and test ETH for gas; rental transactions also send the contract's required payment and deposit.
+
+Never enter or store a wallet private key or recovery phrase in this project. MetaMask should handle transaction signing.
+
+### Start the app
+
+```bash
 npm run dev
 ```
 
-Open the printed local URL (usually `http://localhost:5173`) in a browser with the MetaMask extension installed, set to the **Sepolia testnet**.
-
-### Prerequisites
-- Node.js and npm
-- MetaMask browser extension, funded with Sepolia testnet ETH (available free from any Sepolia faucet)
-- A Firebase project with Authentication (Email/Password) and Firestore enabled
+Open the printed local URL (usually `http://localhost:5173`). If you change `.env` while the dev server is running, restart it. To verify a production build, run `npm run build`.
 
 ---
 
